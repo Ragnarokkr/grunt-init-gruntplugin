@@ -10,64 +10,96 @@
 
 module.exports = function(grunt) {
 
-  // Project configuration.
-  grunt.initConfig({
-    jshint: {
-      all: [
-        'Gruntfile.js',
-        'tasks/*.js',
-        '<%= nodeunit.tests %>',
-      ],
-      options: {
-        jshintrc: '.jshintrc',
-      },
-    },
+	// Project configuration.
+	grunt.initConfig({
+		// Meta
+		pkg: grunt.file.readJSON('package.json'),
 
-    // Before generating any new files, remove any previously-created files.
-    clean: {
-      tests: ['tmp'],
-    },
+		// Check all JS files
+		jshint: {
+			all: [
+				'Gruntfile.js',
+				'tasks/*.js',
+				'<%= nodeunit.tests %>'
+			],
+			options: {
+				jshintrc: '.jshintrc'
+			}
+		},
 
-    // Configuration to be run (and then tested).
-    {%= short_name %}: {
-      default_options: {
-        options: {
-        },
-        files: {
-          'tmp/default_options': ['test/fixtures/testing', 'test/fixtures/123'],
-        },
-      },
-      custom_options: {
-        options: {
-          separator: ': ',
-          punctuation: ' !!!',
-        },
-        files: {
-          'tmp/custom_options': ['test/fixtures/testing', 'test/fixtures/123'],
-        },
-      },
-    },
+		// Before generating any new files, remove any previously-created files.
+		clean: {
+			tests: ['tmp'],
+			readme: ['README.md']
+		},
 
-    // Unit tests.
-    nodeunit: {
-      tests: ['test/*_test.js'],
-    },
+		// Bump to the next version number.
+		bump: {
+			options: {
+				part: 'patch',
+				hardTab: true
+			},
+			files: ['package.json']
+		},
 
-  });
+		// Configuration to be run (and then tested).
+		{%= short_name %}: {
+			default_options: {
+				options: {
+				},
+				files: {
+					'tmp/default_options': ['test/fixtures/testing', 'test/fixtures/123']
+				}
+			},
+			custom_options: {
+				options: {
+					separator: ': ',
+					punctuation: ' !!!'
+				},
+				files: {
+					'tmp/custom_options': ['test/fixtures/testing', 'test/fixtures/123'],
+				}
+			}
+		},
 
-  // Actually load this plugin's task(s).
-  grunt.loadTasks('tasks');
+		// Unit tests.
+		nodeunit: {
+			tests: ['test/*_test.js']
+		},
 
-  // These plugins provide necessary tasks.
-  grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-contrib-nodeunit');
+		// Generate documentation
+		sildoc: {
+			readme: {
+				options: {
+					data: {
+						name: '<%= pkg.name %>',
+						altName: '<%= pkg.name.match(/^(.*).$/)[1] %>',
+						description: '<%= pkg.description %>',
+						gruntVersion: '<%= pkg.devDependencies.grunt %>',
+						gemnasium: {
+							userId: 'Ragnarokkr'
+						}
+					},
+					template: 'src-doc/readme.md.jst'
+				},
+				src: ['src-doc/_*.md.jst'],
+				dest: 'README.md'
+			}
+		}
 
-  // Whenever the "test" task is run, first clean the "tmp" dir, then run this
-  // plugin's task(s), then test the result.
-  grunt.registerTask('test', ['clean', '{%= short_name %}', 'nodeunit']);
+	});
 
-  // By default, lint and run all tests.
-  grunt.registerTask('default', ['jshint', 'test']);
+	// Actually load this plugin's task(s).
+	grunt.loadTasks('tasks');
+
+	// These plugins provide necessary tasks.
+	require( 'matchdep' ).filterDev( 'grunt-*' ).forEach( grunt.loadNpmTasks );
+
+	// Whenever the "test" task is run, first clean the "tmp" dir, then run this
+	// plugin's task(s), then test the result.
+	grunt.registerTask('test', ['clean', '{%= short_name %}', 'nodeunit']);
+
+	// By default, lint and run all tests.
+	grunt.registerTask('default', ['jshint', 'test']);
 
 };
