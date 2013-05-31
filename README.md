@@ -24,3 +24,7 @@ grunt-init gruntplugin
 ```
 
 _Note that this template will generate files in the current directory, so be sure to change to a new directory first if you don't want to overwrite existing files._
+
+## Warning
+
+This fork scaffolds the current directory with more files and directories than the official plugin. These additional files and directories follow my personal taste in developing grunt plugins. **If you don't want to waste a lot of time in removing things you don't need, please look at the [original one][grunt-init].**
